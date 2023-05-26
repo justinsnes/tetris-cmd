@@ -1,38 +1,27 @@
 // Tetris-Cmd.cpp : This file contains the 'main' function. Program execution begins and ends there.
-// compile command:  g++ -DUNICODE Tetris-Cmd.cpp
+// if using OneLoneCoder's example with wchar_t, UNICODE is needed at compile:  g++ -DUNICODE Tetris-Cmd.cpp
 #include <iostream>
 #include <vector>
-#include <algorithm>
+#include <algorithm> // for reversing arrays
+#include <Windows.h> // COORD and direct console screen writes
 
-//#include <cstdlib>
-
-#include <Windows.h>
-//#include <ncurses.h>
-
-#define DUNICODE
-
-// struct COORD {
-//     int x;
-//     int y;
-// };
+//#define DUNICODE
+//unsigned char *pField = nullptr;
 
 const int pieceRows = 4;
 const int pieceCols = 4;
-
-// grids, rows, columns
 int tetrominoLibrary[7][pieceRows][pieceCols];
-int fieldBorderWidth = 12;
-int fieldBorderHeight = 19;
-COORD spawnPoint{4, 0};
-int screenWidth = 60;
-int screenHeight = 60;
-unsigned char *pField = nullptr;
 
-void writeToConsolePosition(int x, int y, char c)
+// screen and playing field
+const int screenWidth = 60;
+const int screenHeight = 60;
+const int fieldBorderWidth = 12;
+const int fieldBorderHeight = 19;
+const COORD spawnPoint{4, 0};
+
+void writeToConsolePosition(short x, short y, char c)
 {
-    COORD coord;
-    coord.X = x;
-    coord.Y = y;
+    COORD coord{x, y};
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
     std::cout << c;
 }
@@ -69,8 +58,8 @@ std::vector<std::vector<int>> rotatePiece(std::vector<std::vector<int>> piece)
 }
 
 void drawPiece(std::vector<std::vector<int>> vec) {
-    int xPos = spawnPoint.X;
-    int yPos = spawnPoint.Y;
+    short xPos = spawnPoint.X;
+    short yPos = spawnPoint.Y;
 
     int rowCounter = 0;
     std::vector<std::vector<int>>::const_iterator row;
@@ -92,9 +81,9 @@ int main()
 {
     // draw playing field
     std::system("cls");
-    for (int y = 0; y < fieldBorderHeight; y++)
+    for (short y = 0; y < fieldBorderHeight; y++)
     {
-        for (int x = 0; x < fieldBorderWidth; x++)
+        for (short x = 0; x < fieldBorderWidth; x++)
         {
             if (x == 0 || x == fieldBorderWidth - 1 || y == fieldBorderHeight - 1)
             {
@@ -136,7 +125,8 @@ int main()
 #pragma endregion The seven shapes of Tetris
 
     // testing pieces
-    std::vector<std::vector<int>> activePiece = createPiece(tetrominoLibrary[1]);
+    srand(time(NULL));
+    std::vector<std::vector<int>> activePiece = createPiece(tetrominoLibrary[rand() % 2]);
     drawPiece(activePiece);
 
     // activePiece = rotatePiece(activePiece);
