@@ -1,23 +1,23 @@
 // Tetris-Cmd.cpp : This file contains the 'main' function. Program execution begins and ends there.
+// developed after installing the MSYS2 collection
 // if using OneLoneCoder's example with wchar_t, UNICODE is needed at compile:  g++ -DUNICODE Tetris-Cmd.cpp
 #include <iostream>
 #include <vector>
-#include <algorithm> // for reversing arrays
 #include <Windows.h> // COORD and direct console screen writes
+#include <chrono>
+#include <thread>
+
+#include "Tetromino.h"
 
 //#define DUNICODE
 //unsigned char *pField = nullptr;
-
-const int pieceRows = 4;
-const int pieceCols = 4;
-int tetrominoLibrary[7][pieceRows][pieceCols];
 
 // screen and playing field
 const int screenWidth = 60;
 const int screenHeight = 60;
 const int fieldBorderWidth = 12;
 const int fieldBorderHeight = 19;
-const COORD spawnPoint{4, 0};
+
 
 void writeToConsolePosition(short x, short y, char c)
 {
@@ -26,55 +26,39 @@ void writeToConsolePosition(short x, short y, char c)
     std::cout << c;
 }
 
-std::vector<std::vector<int>> createPiece(int arr[pieceRows][pieceCols])
-{
-    std::vector<std::vector<int>> createdPiece(pieceRows, std::vector<int>(pieceCols));
+void drawPiece(Tetromino &piece) {
 
-    for (int i = 0; i < pieceRows; ++i) {
-        for (int j = 0; j < pieceCols; ++j) {
-            createdPiece[i][j] = arr[i][j];
-        }
-    }
+    std::vector<std::vector<char>>::const_iterator row;
+    std::vector<char>::const_iterator col;
 
-    return createdPiece;
-}
-
-std::vector<std::vector<int>> rotatePiece(std::vector<std::vector<int>> piece)
-{
-    // for a 90 degree clockwise rotation, transpose the 4x4 grid then reverse each row
-    std::vector<std::vector<int>> rotatedPiece(pieceRows, std::vector<int>(pieceCols));
-
-    for (int i = 0; i < pieceRows; ++i) {
-        for (int j = 0; j < pieceCols; ++j) {
-            rotatedPiece[i][j] = piece[j][i];
-        }
-        std::reverse(rotatedPiece[i].begin(), rotatedPiece[i].end());
-    }
-
-    // the below ends up reversing columns rather than rows for our 2d vector setup
-    //reverse(begin(rotatedPiece), end(rotatedPiece));
-
-    return rotatedPiece;
-}
-
-void drawPiece(std::vector<std::vector<int>> vec) {
-    short xPos = spawnPoint.X;
-    short yPos = spawnPoint.Y;
-
-    int rowCounter = 0;
-    std::vector<std::vector<int>>::const_iterator row;
-    std::vector<int>::const_iterator col;
-    for (row = vec.begin(); row != vec.end(); ++row) {
+    short xPos = piece.lastDrawnPosition.X;
+    short yPos = piece.lastDrawnPosition.Y;
+    for (row = piece.lastDrawnShape.begin(); row != piece.lastDrawnShape.end(); ++row) {
         for (col = row->begin(); col != row->end(); ++col) {
-            if (*col == 1)
+            if (*col != ' ')
             {
-                writeToConsolePosition(xPos, yPos, 'X');
+                writeToConsolePosition(xPos, yPos, ' ');
+            }
+        }
+    }
+
+    xPos = piece.position.X;
+    yPos = piece.position.Y;
+    
+    for (row = piece.shape.begin(); row != piece.shape.end(); ++row) {
+        for (col = row->begin(); col != row->end(); ++col) {
+            if (*col != ' ')
+            {
+                writeToConsolePosition(xPos, yPos, *col);
             }
             xPos++;
         }
         yPos++;
-        xPos = spawnPoint.X;
+        xPos = piece.position.X;
     }
+
+    piece.lastDrawnPosition = piece.position;
+    piece.lastDrawnShape = piece.shape;
 }
 
 int main()
@@ -112,28 +96,19 @@ int main()
     // WriteConsoleOutputCharacter(hConsole, screen, screenWidth*screenHeight, {0,0}, &dwBytesWritten);
 #pragma endregion OneLoneCoder End
 
-#pragma region The seven shapes of Tetris
-    tetrominoLibrary[0][0][2] = 1; // --X-
-    tetrominoLibrary[0][1][2] = 1; // --X-
-    tetrominoLibrary[0][2][2] = 1; // --X-
-    tetrominoLibrary[0][3][2] = 1; // --X-
-
-    tetrominoLibrary[1][0][2] = 1; // --X-
-    tetrominoLibrary[1][1][2] = 1; // --X-
-    tetrominoLibrary[1][2][2] = 1; // -XX-
-    tetrominoLibrary[1][2][1] = 1; // ----
-#pragma endregion The seven shapes of Tetris
 
     // testing pieces
-    srand(time(NULL));
-    std::vector<std::vector<int>> activePiece = createPiece(tetrominoLibrary[rand() % 2]);
-    drawPiece(activePiece);
+    Tetromino newPiece;
 
-    // activePiece = rotatePiece(activePiece);
-    // std::cout << generateAsciiBlock(activePiece) << " End\n";
+    // game loop logic
+    bool endGame = false;
+    while (!endGame)
+    {
+        drawPiece(newPiece);
+        newPiece.rotate();
 
-    // activePiece = rotatePiece(activePiece);
-    // std::cout << generateAsciiBlock(activePiece) << " End\n";
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    }
 
     // the end
     COORD endCoord{0, 21};
