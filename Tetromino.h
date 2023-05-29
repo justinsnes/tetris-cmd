@@ -1,3 +1,6 @@
+#ifndef TETROMINO_H
+#define TETROMINO_H
+
 #include <vector>
 #include <array>
 #include <windows.h>
@@ -16,3 +19,5 @@ public:
 
     void rotate();
 };
+
+#endif
