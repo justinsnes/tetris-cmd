@@ -12,6 +12,7 @@ public:
     COORD position;
     std::vector<std::vector<char>> shape;
 
+    COORD lastDrawnPosition;
     std::vector<COORD> lastDrawnPoints;
 
     static std::vector<std::vector<char>> ShapeLibrary[7];

@@ -80,6 +80,11 @@ void Tetromino::rotate()
 
 void Tetromino::draw()
 {
+    if (this->position.Y == this->lastDrawnPosition.Y && this->position.X == this->lastDrawnPosition.X)
+    {
+        return;
+    }
+
     if (this->lastDrawnPoints.size() > 0)
     {
         for (COORD x : lastDrawnPoints)
@@ -109,4 +114,5 @@ void Tetromino::draw()
         xPos = this->position.X;
     }
 
+    this->lastDrawnPosition = this->position;
 }

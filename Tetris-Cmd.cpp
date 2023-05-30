@@ -73,12 +73,21 @@ int main()
 
     // game loop logic
     bool endGame = false;
+    short framesBeforeAutoDrop = 20; //20 frames equates to a block drop every second. (20 * 50 = 1000 ms)
+    short countedFrames = 0;
     while (!endGame)
     {
-        newPiece.draw();
-        newPiece.rotate();
+        if (countedFrames > framesBeforeAutoDrop)
+        {
+            newPiece.position.Y++;
+            countedFrames = 0;
+        }
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        newPiece.draw();
+        //newPiece.rotate();
+
+        countedFrames++;
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
     }
 
     // the end
