@@ -1,3 +1,4 @@
+#include <iostream>
 #include <algorithm> // for reversing arrays
 #include <chrono>
 #include "Tetromino.h"
@@ -75,4 +76,37 @@ void Tetromino::rotate()
     //reverse(begin(rotatedPiece), end(rotatedPiece));
 
     this->shape = rotatedPiece;
+}
+
+void Tetromino::draw()
+{
+    if (this->lastDrawnPoints.size() > 0)
+    {
+        for (COORD x : lastDrawnPoints)
+        {
+            SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), x);
+            std::cout << ' ';
+        }
+    }
+
+    short xPos = this->position.X;
+    short yPos = this->position.Y;
+    
+    std::vector<std::vector<char>>::const_iterator row;
+    std::vector<char>::const_iterator col;
+    for (row = this->shape.begin(); row != this->shape.end(); ++row) {
+        for (col = row->begin(); col != row->end(); ++col) {
+            if (*col != ' ')
+            {
+                COORD piecePixel{ xPos, yPos };
+                SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), piecePixel);
+                std::cout << *col;
+                this->lastDrawnPoints.push_back(piecePixel);
+            }
+            xPos++;
+        }
+        yPos++;
+        xPos = this->position.X;
+    }
+
 }

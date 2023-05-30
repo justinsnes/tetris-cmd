@@ -26,39 +26,11 @@ void writeToConsolePosition(short x, short y, char c)
     std::cout << c;
 }
 
-void drawPiece(Tetromino &piece) {
-
-    std::vector<std::vector<char>>::const_iterator row;
-    std::vector<char>::const_iterator col;
-
-    short xPos = piece.lastDrawnPosition.X;
-    short yPos = piece.lastDrawnPosition.Y;
-    for (row = piece.lastDrawnShape.begin(); row != piece.lastDrawnShape.end(); ++row) {
-        for (col = row->begin(); col != row->end(); ++col) {
-            if (*col != ' ')
-            {
-                writeToConsolePosition(xPos, yPos, ' ');
-            }
-        }
-    }
-
-    xPos = piece.position.X;
-    yPos = piece.position.Y;
-    
-    for (row = piece.shape.begin(); row != piece.shape.end(); ++row) {
-        for (col = row->begin(); col != row->end(); ++col) {
-            if (*col != ' ')
-            {
-                writeToConsolePosition(xPos, yPos, *col);
-            }
-            xPos++;
-        }
-        yPos++;
-        xPos = piece.position.X;
-    }
-
-    piece.lastDrawnPosition = piece.position;
-    piece.lastDrawnShape = piece.shape;
+void writeToConsolePositionShort(short x, short y, short s)
+{
+    COORD coord{x, y};
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+    std::cout << s;
 }
 
 int main()
@@ -96,7 +68,6 @@ int main()
     // WriteConsoleOutputCharacter(hConsole, screen, screenWidth*screenHeight, {0,0}, &dwBytesWritten);
 #pragma endregion OneLoneCoder End
 
-
     // testing pieces
     Tetromino newPiece;
 
@@ -104,7 +75,7 @@ int main()
     bool endGame = false;
     while (!endGame)
     {
-        drawPiece(newPiece);
+        newPiece.draw();
         newPiece.rotate();
 
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
