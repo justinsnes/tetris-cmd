@@ -26,13 +26,6 @@ void writeToConsolePosition(short x, short y, char c)
     std::cout << c;
 }
 
-void writeToConsolePositionShort(short x, short y, short s)
-{
-    COORD coord{x, y};
-    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
-    std::cout << s;
-}
-
 int main()
 {
     // draw playing field
