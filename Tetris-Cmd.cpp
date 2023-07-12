@@ -66,14 +66,14 @@ int main()
 
     // game loop logic
     bool endGame = false;
-    short framesBeforeAutoDrop = 20; //20 frames equates to a block drop every second. (20 * 50 = 1000 ms)
+    short framesBeforeAutoDrop = 20; //20 frames equates to a block drop roughly every second. (20 * 50 = 1000 ms)
     short countedFrames = 0;
     while (!endGame)
     {
-        if (countedFrames > framesBeforeAutoDrop)
+        if (countedFrames >= framesBeforeAutoDrop)
         {
             newPiece.position.Y++;
-            countedFrames = 0;
+            countedFrames = 1;
         }
 
         newPiece.draw();
